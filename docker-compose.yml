@@ -1,0 +1,52 @@
+version: '3.8'
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "80:80"
+    volumes:
+      - ./backend/app:/code/app
+    depends_on:
+      - ollama
+    networks:
+      - ollama-docker
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    depends_on:
+      - backend
+      - ollama
+    networks:
+      - ollama-docker
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - 11434:11434
+    volumes:
+      - .:/code
+      - ./ollama/ollama:/root/.ollama
+      - ./start-ollama.sh:/start-ollama.sh
+    container_name: ollama
+    restart: always
+    networks:
+      - ollama-docker
+    healthcheck:
+      test: [ "CMD", "pgrep", "-f", "ollama" ]
+      interval: 30s
+      retries: 10
+      start_period: 120s
+      timeout: 10s
+    entrypoint: /bin/sh
+    command: /start-ollama.sh
+
+
+
+networks:
+  ollama-docker:
+    external: false

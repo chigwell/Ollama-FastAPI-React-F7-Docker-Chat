@@ -1,0 +1,8 @@
+fastapi==0.75.0
+uvicorn==0.15.0
+langchain-community
+langchain
+requests
+ollama
+websockets
+httpx
